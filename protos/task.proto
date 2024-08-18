@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+service Worker {
+  rpc AnalyzeData (AnalysisRequest) returns (AnalysisResponse);
+}
+
+message AnalysisRequest {
+  bytes data = 1;
+}
+
+message AnalysisResponse {
+  string result = 1;
+}
