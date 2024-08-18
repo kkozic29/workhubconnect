@@ -9,28 +9,22 @@ class Worker(task_pb2_grpc.WorkerServicer):
     def AnalyzeData(self, request, context):
         data = request.data
         try:
-            # Pokušaj čitanja CSV-a iz binarnih podataka
             df = pd.read_csv(BytesIO(data))
         except Exception as e:
-            # Ako dođe do pogreške prilikom čitanja CSV-a, ispiši pogrešku
             context.set_details(f'Failed to read CSV data: {str(e)}')
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             return task_pb2.AnalysisResponse(result="Error in analysis")
         
-        # Provjeri prve redove datoteke da vidiš kako izgleda
         print("First few rows of the data:")
         print(df.head())
 
-        # Analiziraj podatke: Na primjer, sumiraj smrtne slučajeve zbog COVID-19 po državi
         try:
             summary = df.groupby('State')['Deaths involving COVID-19'].sum()
         except KeyError as e:
-            # Ako dođe do pogreške prilikom grupiranja, ispiši pogrešku
             context.set_details(f'Failed to group data: {str(e)}')
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             return task_pb2.AnalysisResponse(result="Error in analysis")
 
-        # Ispiši rezultate analize
         print("Summary of deaths involving COVID-19 by state:")
         print(summary)
 
