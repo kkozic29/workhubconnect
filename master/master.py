@@ -4,8 +4,8 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import task_pb2
-import task_pb2_grpc
+import worker.task_pb2 as task_pb2
+import worker.task_pb2_grpc as task_pb2_grpc
 
 class Master:
     def __init__(self):
