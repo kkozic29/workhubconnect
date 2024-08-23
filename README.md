@@ -7,3 +7,4 @@ WorkHubConnect je aplikacija za raspodijeljeno upravljanje analizom podataka iz 
 1. **Kreirajte virtualno okruženje**:
    ```bash
    python -m venv venv
+   source venv/bin/activate  # Na Windowsu: venv\Scripts\activate

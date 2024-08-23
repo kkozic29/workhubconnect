@@ -35,7 +35,7 @@ class Master:
             print(f"Response from worker: {response.result}")
 
         except grpc.RpcError as e:
-            print(f"gRPC error occurred: {e}")
+            print(f"gRPC error occurred: {e.code()} - {e.details()}")
 
 if __name__ == '__main__':
     master = Master()

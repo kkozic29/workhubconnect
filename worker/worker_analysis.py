@@ -2,8 +2,17 @@ import grpc
 import task_pb2
 import task_pb2_grpc
 import pandas as pd
+import os
 from concurrent import futures
 from io import BytesIO
+
+def print_csv_content(file_path):
+    try:
+        df = pd.read_csv(file_path)
+        print("Contents of the CSV file:")
+        print(df.head()) 
+    except Exception as e:
+        print(f"Error reading CSV file: {e}")
 
 class Worker(task_pb2_grpc.WorkerServicer):
     def AnalyzeData(self, request, context):
@@ -31,6 +40,10 @@ class Worker(task_pb2_grpc.WorkerServicer):
         return task_pb2.AnalysisResponse(result="Analysis complete")
 
 def serve():
+    csv_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'COVID_Death_USA.csv')
+    
+    print_csv_content(csv_file)
+    
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     task_pb2_grpc.add_WorkerServicer_to_server(Worker(), server)
     server.add_insecure_port('[::]:50051')

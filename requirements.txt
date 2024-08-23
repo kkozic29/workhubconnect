@@ -1,3 +1,5 @@
 zmq
-grpcio
-grpcio-tools
+grpcio==1.65.0
+grpcio-tools==1.65.0
+pandas==2.0.3
+
