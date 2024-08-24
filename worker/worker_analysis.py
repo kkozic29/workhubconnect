@@ -6,7 +6,7 @@ from concurrent import futures
 from io import BytesIO
 import task_pb2
 import task_pb2_grpc
-from grpc_reflection.v1alpha import reflection  
+from grpc_reflection.v1alpha import reflection
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -14,7 +14,7 @@ def print_csv_content(file_path):
     try:
         df = pd.read_csv(file_path)
         print("Contents of the CSV file:")
-        print(df)  
+        print(df) 
     except Exception as e:
         print(f"Error reading CSV file: {e}")
 
@@ -29,7 +29,7 @@ class Worker(task_pb2_grpc.WorkerServicer):
             return task_pb2.AnalysisResponse(result="Error in analysis")
 
         print("First few rows of the data:")
-        print(df.head())
+        print(df.head())  
 
         try:
             summary = df.groupby('State')['Deaths involving COVID-19'].sum()
@@ -51,6 +51,13 @@ class Worker(task_pb2_grpc.WorkerServicer):
             context.set_details(f'Failed to analyze data: {str(e)}')
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             return task_pb2.AnalysisResponse(result="Error in analysis")
+
+        print("Data analysis complete.")
+        print("Total deaths: ", total_deaths)
+        print("Summary of deaths by state:")
+        print(summary)
+        print("Proportion of deaths by state:")
+        print(proportion)
 
         return task_pb2.AnalysisResponse(result="Analysis complete")
 
