@@ -70,13 +70,13 @@ def serve():
     
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     task_pb2_grpc.add_WorkerServicer_to_server(Worker(), server)
-    
+
     SERVICE_NAMES = (
         task_pb2.DESCRIPTOR.services_by_name['Worker'].full_name,
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
-    
+
     server.add_insecure_port('[::]:50052')
     server.start()
     print("Worker server started on port 50052.")
