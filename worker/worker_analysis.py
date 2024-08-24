@@ -6,7 +6,7 @@ from concurrent import futures
 from io import BytesIO
 import task_pb2
 import task_pb2_grpc
-from grpc_reflection.v1alpha import reflection
+from grpc_reflection.v1alpha import reflection  
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -54,23 +54,13 @@ class Worker(task_pb2_grpc.WorkerServicer):
 
         return task_pb2.AnalysisResponse(result="Analysis complete")
 
-def check_connection():
-    """Provjerava vezu s gRPC serverom."""
-    try:
-        with grpc.insecure_channel('127.0.0.1:50052') as channel:
-            grpc.channel_ready_future(channel).result(timeout=5)
-        print("Connection successful!")
-    except grpc.FutureTimeoutError:
-        print("Connection failed or timed out.")
-
 def serve():
     csv_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'COVID_Death_USA.csv')
-    
     print_csv_content(csv_file)  
     
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     task_pb2_grpc.add_WorkerServicer_to_server(Worker(), server)
-
+    
     SERVICE_NAMES = (
         task_pb2.DESCRIPTOR.services_by_name['Worker'].full_name,
         reflection.SERVICE_NAME,
@@ -80,8 +70,6 @@ def serve():
     server.add_insecure_port('[::]:50052')
     server.start()
     print("Worker server started on port 50052.")
-
-    check_connection()
     
     server.wait_for_termination()
 
