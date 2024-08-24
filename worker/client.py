@@ -11,13 +11,14 @@ def run():
                 data = f.read()
             response = stub.AnalyzeData(task_pb2.AnalysisRequest(data=data))
 
-            print("Odgovor servera: " + response.result)
+            print("Server Response:")
+            print(response.result)
         
         except FileNotFoundError:
-            print("CSV datoteka nije pronađena. Provjerite putanju.")
+            print("CSV file not found. Check the path.")
         
         except grpc.RpcError as e:
-            print(f"gRPC greška: {e.code()} - {e.details()}")
+            print(f"gRPC error: {e.code()} - {e.details()}")
 
 if __name__ == '__main__':
     run()

@@ -1,47 +1,31 @@
-import grpc
-import os
 import sys
+import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+worker_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../worker'))
+sys.path.append(worker_path)
 
+print(f"Current sys.path: {sys.path}")
+
+import grpc
 import worker.task_pb2 as task_pb2
 import worker.task_pb2_grpc as task_pb2_grpc
 
-class Master:
-    def __init__(self):
-        self.channel = grpc.insecure_channel('localhost:50051')
-        self.stub = task_pb2_grpc.WorkerStub(self.channel)
-
-    def print_csv_content(self, csv_file):
-        """ Ispisuje sadržaj CSV datoteke """
+def run_worker_analysis(file_path):
+    with grpc.insecure_channel('localhost:50052') as channel:
+        stub = task_pb2_grpc.WorkerStub(channel)
+        
         try:
-            with open(csv_file, 'r') as f:
-                print(f"Contents of {csv_file}:")
-                print(f.read())
-        except FileNotFoundError:
-            print(f"File {csv_file} not found.")
-        except IOError as e:
-            print(f"Error reading file {csv_file}: {e}")
-
-    def distribute_task(self, csv_file):
-        """ Distribuira zadatak radniku """
-        try:
-            with open(csv_file, 'rb') as f:
+            with open(file_path, 'rb') as f:
                 data = f.read()
-            
-            request = task_pb2.AnalysisRequest(data=data)
-            
-            response = self.stub.AnalyzeData(request)
-            print(f"Response from worker: {response.result}")
+            response = stub.AnalyzeData(task_pb2.AnalysisRequest(data=data))
+            print("Server Response:")
+            print(response.result)
 
+        except FileNotFoundError:
+            print("CSV file not found. Check the path.")
         except grpc.RpcError as e:
-            print(f"gRPC error occurred: {e.code()} - {e.details()}")
+            print(f"gRPC error: {e.code()} - {e.details()}")
 
 if __name__ == '__main__':
-    master = Master()
-
-    csv_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'COVID_Death_USA.csv')
-    
-    master.print_csv_content(csv_file)
-
-    master.distribute_task(csv_file)
+    file_path = 'C:/Users/Korisnik/IdeaProjects/WorkHubConnect/data/COVID_Death_USA.csv'
+    run_worker_analysis(file_path)
