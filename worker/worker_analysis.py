@@ -4,11 +4,13 @@ import grpc
 import pandas as pd
 from concurrent import futures
 from io import BytesIO
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../protos')))
+
 import task_pb2
 import task_pb2_grpc
-from grpc_reflection.v1alpha import reflection  
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from grpc_reflection.v1alpha import reflection
 
 def print_csv_content(file_path):
     try:

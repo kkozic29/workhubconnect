@@ -1,14 +1,14 @@
 import sys
 import os
 
-worker_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../worker'))
-sys.path.append(worker_path)
+protos_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'protos'))
+sys.path.append(protos_path)
 
 print(f"Current sys.path: {sys.path}")
 
 import grpc
-import worker.task_pb2 as task_pb2
-import worker.task_pb2_grpc as task_pb2_grpc
+import task_pb2 as task_pb2 
+import task_pb2_grpc as task_pb2_grpc 
 
 def run_worker_analysis(file_path):
     with grpc.insecure_channel('localhost:50052') as channel:
