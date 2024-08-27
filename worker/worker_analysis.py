@@ -4,12 +4,11 @@ import grpc
 import pandas as pd
 from concurrent import futures
 from io import BytesIO
+import csv
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../protos')))
-
 import task_pb2
 import task_pb2_grpc
-
 from grpc_reflection.v1alpha import reflection
 
 def print_csv_content(file_path):
@@ -19,6 +18,18 @@ def print_csv_content(file_path):
         print(df)  
     except Exception as e:
         print(f"Error reading CSV file: {e}")
+
+def save_analysis_to_csv(total_deaths, max_deaths_state, max_deaths_value, proportions, output_file='analysis_results.csv'):
+    """Saves the analysis results to a CSV file."""
+    with open(output_file, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Metric", "Value"]) 
+        writer.writerow(["Total deaths involving COVID-19", total_deaths])
+        writer.writerow(["State with the highest deaths", f"{max_deaths_state} ({max_deaths_value} deaths)"])
+        writer.writerow(["Proportions by state"])
+        for state, proportion in proportions.items():
+            writer.writerow([state, proportion])
+    print(f"Analysis results saved to {output_file}")
 
 class Worker(task_pb2_grpc.WorkerServicer):
     def AnalyzeData(self, request, context):
@@ -56,6 +67,8 @@ class Worker(task_pb2_grpc.WorkerServicer):
             )
             print("Analysis Results:")
             print(analysis_result)
+
+            save_analysis_to_csv(total_deaths, max_deaths_state, max_deaths_value, proportion.to_dict())
 
         except KeyError as e:
             context.set_details(f'Failed to analyze data: {str(e)}')
